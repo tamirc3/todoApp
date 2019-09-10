@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <link href="/assests/styles.css" rel="stylesheet" type="text/css">
+        <title>to do list</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="/assests/todo-list.js"></script>
+    </head>
+    <body>
+        <div id = "todo-table">
+            <form>
+                <input type="text" name="item" placeholder="Add new item..." required/>
+                <button type="submit">AddItem</button>
+            </form>
+            <ul>
+                <% for(var i=0; i < todos.length;i++){ %>
+                    <li><%=todos[i].item%></li> <!--note that for using data we added '=' and for js code its just %-->
+                 <% } %>
+            </ul>
+        </div>
+    </body>
+</html>

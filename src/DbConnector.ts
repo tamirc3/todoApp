@@ -1,52 +1,59 @@
-/*
+
 import mongoose from 'mongoose';
 
 export class DBConnector {
 
-    GetItemsFromDB():{item:string}[]{
+    connectionString: string;
+    toDoSchema!: mongoose.Schema;
+    ToDo!: mongoose.Model<mongoose.Document, {}>
 
-        var toDoSchema = new mongoose.Schema({
-            item: {
-              type: String,
-              required: true,
-            }
-          });
-        var ToDo = mongoose.model('ToDo',toDoSchema)//we creating a model
-        var dataToReturn:{item:string}[]=[];
+    constructor(connectionString: string) {
+        this.connectionString = connectionString
 
-        ToDo.find({},(err,data)=>{//to get specific item{item:"flowers"} if empty return all
-            if (err)
-            throw err;
-            dataToReturn= data
-        })
-
-        return dataToReturn;
+        this.ConnectToDBAndCreateSchemaAndModel();
     }
-ConenctToB(){
 
-    let connectionString = "mongodb+srv://nice:nicecti1!@todo-6i4as.mongodb.net/test?retryWrites=true&w=majority";
-    mongoose.connect(connectionString);
-    
-    var toDoSchema = new mongoose.Schema({
-           item: {
-             type: String,
-             required: true,
-           }
-         });
+    ConnectToDBAndCreateSchemaAndModel() {
+        mongoose.connect(this.connectionString);
+        this.toDoSchema = new mongoose.Schema({
+            item: {
+                type: String,
+                required: true,
+            }
+        });
+        this.ToDo = mongoose.model('ToDo', this.toDoSchema)//we creating a model
+    }
 
-    var ToDo = mongoose.model('ToDo',toDoSchema)//we creating a model
+    GetItemsFromDB(): { item: string }[] {
 
-    var item1 = new ToDo({item:"buy flowers"}).
-    save(
-        (err)=>{
-            if(err){
+        var dataToReturn: { item: string }[] = [];
+
+        this.ToDo.find({}, (err, data: Document[]) => {//to get specific item{item:"flowers"} if empty return all
+            if (err) {
+                console.log("error")
                 throw err;
             }
-            console.log("item saved")
-        }
-        )
+            else { //convert to {item:string}
 
-
-
+                data.forEach(element => {
+                    var itemElement = JSON.parse(JSON.stringify(element));
+                    dataToReturn.push(itemElement)
+                });
+            }
+        })
+        return dataToReturn;
     }
-}*/
+
+    //todo
+    /*  AddToDB() {
+          var item1 = new ToDo({ item: "buy flowers" }).
+              save(
+                  (err) => {
+                      if (err) {
+                          throw err;
+                      }
+                      console.log("item saved")
+                  }
+              )
+      }*/
+}

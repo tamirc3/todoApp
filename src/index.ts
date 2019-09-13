@@ -17,7 +17,7 @@ app.use(express.static('public'));
 //todoController.InitApp();
 
 
-let connectionString = "mongodb+srv://nice:nicecti1!@todo-6i4as.mongodb.net/test?retryWrites=true&w=majority";
+let connectionString = "";
 var dBConnector = new DBConnector(connectionString)
 var todoControllerDB = new ToDoControllerDB(app, dBConnector)
 

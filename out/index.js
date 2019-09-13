@@ -14,7 +14,7 @@ app.use(express_1.default.static('public'));
 //fire controllers
 //var todoController = new ToDoController(app)
 //todoController.InitApp();
-var connectionString = "mongodb+srv://nice:nicecti1!@todo-6i4as.mongodb.net/test?retryWrites=true&w=majority";
+var connectionString = "";
 var dBConnector = new DbConnector_1.DBConnector(connectionString);
 var todoControllerDB = new ToDoControllerDB_1.ToDoControllerDB(app, dBConnector);
 todoControllerDB.InitApp();

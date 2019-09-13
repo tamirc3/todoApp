@@ -19,14 +19,15 @@ export class ToDoControllerDB {
 
         this.app.get('/todo', (req, res) => {
 
-            this.getItemsFromDB(res);
+            console.log("GOT GET REQUEST")
+            this.getItemsFromDBAndRenderResult(res);
 
         });
 
         this.app.post('/todo', urlEncoderParser, (req, res) => {
             this.dbConnector.AddItemToDB(req.body).then(
                 () => {
-                    this.getItemsFromDB(res);
+                    this.getItemsFromDBAndRenderResult(res);
                 }
             )
         });
@@ -37,16 +38,17 @@ export class ToDoControllerDB {
             let item = {item:req.params.item}
             this.dbConnector.DeleteItemFromDB(item).then(
                 () => {
-                    this.getItemsFromDB(res);
+                    this.getItemsFromDBAndRenderResult(res);
                 }
             )
         });
     }
 
-
-    private getItemsFromDB(res: core.Response) {
+///since it is doing a get request after post/delete, this method is not needed....
+//but it was a good practise for using promise... :)
+    private getItemsFromDBAndRenderResult(res: core.Response) {
+        console.log("going to call get from DB")
         this.dbConnector.GetItemsFromDB().then((data: {
-            
             item: string;
         }[]) => { res.render('todo', { todos: data }); });
     }

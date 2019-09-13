@@ -44,7 +44,7 @@ var DBConnector = /** @class */ (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var item1 = new _this.ToDo(item).
-                save(function (err, data) {
+                save(function (err) {
                 if (err) {
                     console.error("failed to save to DB");
                     throw err;

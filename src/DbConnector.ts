@@ -56,7 +56,7 @@ export class DBConnector {
 
             var item1 = new this.ToDo(item).
             save(
-                (err, data) => {
+                (err) => {
                     if (err) {
                         console.error("failed to save to DB");
                         throw err;

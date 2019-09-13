@@ -10,7 +10,7 @@ var DBConnector = /** @class */ (function () {
         this.ConnectToDBAndCreateSchemaAndModel();
     }
     DBConnector.prototype.ConnectToDBAndCreateSchemaAndModel = function () {
-        mongoose_1.default.connect(this.connectionString);
+        mongoose_1.default.connect(this.connectionString, { useUnifiedTopology: true, useNewUrlParser: true });
         this.toDoSchema = new mongoose_1.default.Schema({
             item: {
                 type: String,
@@ -20,20 +20,50 @@ var DBConnector = /** @class */ (function () {
         this.ToDo = mongoose_1.default.model('ToDo', this.toDoSchema); //we creating a model
     };
     DBConnector.prototype.GetItemsFromDB = function () {
-        var dataToReturn = [];
-        this.ToDo.find({}, function (err, data) {
-            if (err) {
-                console.log("error");
-                throw err;
-            }
-            else { //convert to {item:string}
-                data.forEach(function (element) {
-                    var itemElement = JSON.parse(JSON.stringify(element));
-                    dataToReturn.push(itemElement);
-                });
-            }
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var dataToReturn = [];
+            _this.ToDo.find({}, function (err, data) {
+                if (err) {
+                    console.log("error");
+                    reject();
+                    throw err;
+                }
+                else { //convert to {item:string}
+                    data.forEach(function (element) {
+                        var itemElement = JSON.parse(JSON.stringify(element));
+                        dataToReturn.push(itemElement);
+                    });
+                    console.log("got #" + dataToReturn.length + "items from DB");
+                    resolve(dataToReturn);
+                }
+            });
         });
-        return dataToReturn;
+    };
+    DBConnector.prototype.AddItemToDB = function (item) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var item1 = new _this.ToDo(item).
+                save(function (err, data) {
+                if (err) {
+                    console.error("failed to save to DB");
+                    throw err;
+                }
+            });
+            console.log(item.item + " was added");
+            resolve();
+        });
+    };
+    DBConnector.prototype.DeleteItemFromDB = function (item) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.ToDo.find(item).remove(function (err) {
+                if (err)
+                    throw err;
+            });
+            console.log(item.item + " was deleted");
+            resolve();
+        });
     };
     return DBConnector;
 }());

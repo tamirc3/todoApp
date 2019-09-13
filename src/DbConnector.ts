@@ -1,5 +1,7 @@
 
 import mongoose from 'mongoose';
+import { resolve } from 'url';
+import { rejects } from 'assert';
 
 export class DBConnector {
 
@@ -14,7 +16,7 @@ export class DBConnector {
     }
 
     ConnectToDBAndCreateSchemaAndModel() {
-        mongoose.connect(this.connectionString);
+        mongoose.connect(this.connectionString,{ useUnifiedTopology: true,useNewUrlParser: true });
         this.toDoSchema = new mongoose.Schema({
             item: {
                 type: String,
@@ -24,36 +26,63 @@ export class DBConnector {
         this.ToDo = mongoose.model('ToDo', this.toDoSchema)//we creating a model
     }
 
-    GetItemsFromDB(): { item: string }[] {
+    GetItemsFromDB(): Promise<{ item: string }[]> {
 
-        var dataToReturn: { item: string }[] = [];
-
-        this.ToDo.find({}, (err, data: Document[]) => {//to get specific item{item:"flowers"} if empty return all
-            if (err) {
-                console.log("error")
-                throw err;
-            }
-            else { //convert to {item:string}
-
-                data.forEach(element => {
-                    var itemElement = JSON.parse(JSON.stringify(element));
-                    dataToReturn.push(itemElement)
-                });
-            }
-        })
-        return dataToReturn;
+        return new Promise((resolve,reject) => {
+            var dataToReturn: { item: string }[] = [];
+            this.ToDo.find({}, (err, data: Document[]) => {//to get specific item{item:"flowers"} if empty return all
+                if (err) {
+                    console.log("error")
+                    reject()
+                    throw err;
+                }
+                else { //convert to {item:string}
+                  
+                    data.forEach(element => {
+                        var itemElement = JSON.parse(JSON.stringify(element));
+                        dataToReturn.push(itemElement)
+                    });
+                    console.log("got #"+ dataToReturn.length+"items from DB")
+                    resolve(dataToReturn);
+                }
+            })
+        }) 
     }
 
-    //todo
-    /*  AddToDB() {
-          var item1 = new ToDo({ item: "buy flowers" }).
-              save(
-                  (err) => {
-                      if (err) {
-                          throw err;
-                      }
-                      console.log("item saved")
-                  }
-              )
-      }*/
+    
+      AddItemToDB(item:{item:string}) :Promise<void> {
+
+        return new Promise((resolve,reject) => {
+
+            var item1 = new this.ToDo(item).
+            save(
+                (err, data) => {
+                    if (err) {
+                        console.error("failed to save to DB");
+                        throw err;
+                    }
+                }
+            )
+            console.log(item.item + " was added")
+            resolve();
+        });
+        
+
+      }
+
+      DeleteItemFromDB(item:{item:string}) :Promise<void> {
+
+        return new Promise((resolve,reject) => {
+            this.ToDo.find(item).remove(
+                (err) => {
+                    if (err)
+                        throw err;
+                })
+
+                console.log(item.item + " was deleted")
+            resolve();
+        });
+        
+
+      }
 }

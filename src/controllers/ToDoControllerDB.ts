@@ -18,36 +18,36 @@ export class ToDoControllerDB {
         var urlEncoderParser = bodyparser.urlencoded({ extended: false })
 
         this.app.get('/todo', (req, res) => {
-            var data= this.dbConnector.GetItemsFromDB()
-               console.warn(data);
-                res.render('todo', { todos: data });
+
+            this.getItemsFromDB(res);
+
         });
-/*
+
         this.app.post('/todo', urlEncoderParser, (req, res) => {
-
-            var item1 = new ToDo({ item: req.body["item"] }).
-                save(
-                    (err, data) => {
-                        if (err) {
-                            throw err;
-                        }
-                        res.json(data)
-                    }
-                )
+            this.dbConnector.AddItemToDB(req.body).then(
+                () => {
+                    this.getItemsFromDB(res);
+                }
+            )
         });
-*/
-        //'/todo/:item' its a paramter the comes with the URL
-        this.app.delete('/todo/:item', (req, res) => {
-
-            /*ToDo.find({ item: req.params.item }).remove(
-                (err, data) => {
-                    if (err)
-                        throw err;
-                    res.json(data)
-                })
-*/
+ 
+         //'/todo/:item' its a paramter the comes with the URL
+         this.app.delete('/todo/:item', (req, res) => {
+ 
+            let item = {item:req.params.item}
+            this.dbConnector.DeleteItemFromDB(item).then(
+                () => {
+                    this.getItemsFromDB(res);
+                }
+            )
         });
     }
 
 
+    private getItemsFromDB(res: core.Response) {
+        this.dbConnector.GetItemsFromDB().then((data: {
+            
+            item: string;
+        }[]) => { res.render('todo', { todos: data }); });
+    }
 }
